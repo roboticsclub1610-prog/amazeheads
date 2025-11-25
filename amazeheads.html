@@ -129,61 +129,29 @@
 </footer>
 
 <script>
-  // Toggle menu
-  function toggleDropdown() {
-    const menu = document.getElementById('dropdownMenu');
-    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
-  }
+async function sha256(text) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+}
 
-  // Admin login panel
-  function showAdminPanel() {
-    const pass = prompt('Enter admin password:');
-    if (pass === 'Amaze2025') {
-      document.getElementById('adminPanel').style.display = 'block';
+const ADMIN_HASH = "c3a4ae5d8f122f25498b1b0e5bc9f0f0c9e63c65f5ab0bc7d2b1d8c0ab82f4d0";
+
+async function loginAdmin() {
+    const input = prompt("Enter admin password:");
+    const hash = await sha256(input);
+
+    if (hash === ADMIN_HASH) {
+        document.getElementById("adminPanel").style.display = "block";
+        alert("Admin access granted");
     } else {
-      alert('Incorrect password');
+        alert("Incorrect password");
     }
-  }
-
-  // Load gallery
-  let galleryItems = JSON.parse(localStorage.getItem('gallery')) || [];
-  function renderGallery() {
-    const container = document.getElementById('gallery');
-    container.innerHTML = '';
-
-    galleryItems.forEach((item) => {
-      const div = document.createElement('div');
-      div.className = 'card';
-
-      if (item.type.startsWith('image')) {
-        div.innerHTML = `<img src="${item.url}" /><br><a class="download" download href="${item.url}">Download</a>`;
-      } else {
-        div.innerHTML = `<video controls src="${item.url}"></video><br><a class="download" download href="${item.url}">Download</a>`;
-      }
-      container.appendChild(div);
-    });
-  }
-  renderGallery();
-
-  // Upload media
-  function uploadMedia() {
-    const input = document.getElementById('mediaInput');
-    const files = input.files;
-    if (!files.length) return;
-
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        galleryItems.push({ type: file.type, url: e.target.result });
-        localStorage.setItem('gallery', JSON.stringify(galleryItems));
-        renderGallery();
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById('uploadMsg').innerText = 'Upload successful!';
-  }
+}
 </script>
+
 <script>
 // Calm Soft Particles Background
 const canvas = document.getElementById("calm-particles");
@@ -247,5 +215,6 @@ setTimeout(() => {
 
 </body>
 </html>
+
 
 
